@@ -52,6 +52,8 @@ A comprehensive AI-powered misinformation detection system that analyzes text co
    - Sign in with your Google account
    - Click "Create API Key"
    - Copy the key to your `.env` file
+   
+   **⚠️ Security Note:** Never commit your API key to version control. The `.env` file is already in `.gitignore`.
 
 4. **Initialize the database:**
    ```bash

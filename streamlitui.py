@@ -76,15 +76,39 @@ with st.sidebar:
     st.header("⚙️ Configuration")
     
     # AI Configuration
-    gemini_api_key = st.text_input(
-        "Gemini API Key", 
-        value=os.getenv("GEMINI_API_KEY", ""),
-        type="password",
-        help="Your Google Gemini API key"
-    )
+    st.subheader("🔑 API Configuration")
     
-    if gemini_api_key:
+    # Try to get API key from secrets first, then environment, then user input
+    api_key_from_secrets = None
+    try:
+        api_key_from_secrets = st.secrets.get("GEMINI_API_KEY", None)
+    except:
+        pass
+    
+    api_key_from_env = os.getenv("GEMINI_API_KEY", "")
+    
+    if api_key_from_secrets:
+        st.success("✅ API Key loaded from Streamlit secrets")
+        gemini_api_key = api_key_from_secrets
         os.environ["GEMINI_API_KEY"] = gemini_api_key
+    elif api_key_from_env and api_key_from_env != "your-gemini-api-key-here":
+        st.success("✅ API Key loaded from environment")
+        gemini_api_key = api_key_from_env
+    else:
+        st.warning("⚠️ API Key required for analysis")
+        gemini_api_key = st.text_input(
+            "Enter your Gemini API Key", 
+            value="",
+            type="password",
+            help="Get your API key from: https://makersuite.google.com/app/apikey",
+            placeholder="Enter your Gemini API key here..."
+        )
+        
+        if gemini_api_key:
+            os.environ["GEMINI_API_KEY"] = gemini_api_key
+            st.success("✅ API Key configured for this session")
+        else:
+            st.info("💡 For deployment, add GEMINI_API_KEY to your Streamlit secrets")
     
     st.markdown("---")
     
@@ -92,6 +116,17 @@ with st.sidebar:
     st.subheader("Analysis Settings")
     max_claims = st.slider("Max Claims to Analyze", 1, 10, 5)
     analysis_timeout = st.slider("Analysis Timeout (seconds)", 10, 60, 30)
+    
+    st.markdown("---")
+    
+    # Security note
+    st.subheader("🔒 Security")
+    st.info("""
+    **API Key Security:**
+    • Keys entered here are only stored for this session
+    • For deployment, use Streamlit secrets
+    • Never share your API key publicly
+    """)
     
     st.markdown("---")
     
@@ -372,9 +407,10 @@ with col2:
 with col3:
     st.subheader("🛠️ Status")
     # AI Service check
-    if AGENT_AVAILABLE and os.getenv("GEMINI_API_KEY"):
+    current_api_key = os.getenv("GEMINI_API_KEY", "")
+    if AGENT_AVAILABLE and current_api_key and current_api_key != "your-gemini-api-key-here":
         st.success("✅ AI Service Ready")
-    elif AGENT_AVAILABLE and not os.getenv("GEMINI_API_KEY"):
+    elif AGENT_AVAILABLE and not current_api_key:
         st.warning("⚠️ API Key Needed")
     else:
         st.error("❌ AI Service Unavailable")

@@ -19,11 +19,16 @@ Deploy your Misinformation Detection System as a pure Streamlit application.
    - Click "New app"
    - Select your repository
    - Set main file: `streamlitui.py`
-   - Add secrets in "Advanced settings":
+   - **IMPORTANT**: Add secrets in "Advanced settings":
      ```
-     GEMINI_API_KEY = "your-api-key-here"
+     GEMINI_API_KEY = "your-actual-api-key-here"
      ```
    - Click "Deploy"
+
+### 🔒 Security Best Practices:
+- **Never commit API keys** to your repository
+- **Always use Streamlit secrets** for deployment
+- **API keys entered in the UI** are only for testing/temporary use
 
 3. **Your app will be live at:** `https://your-app-name.streamlit.app`
 
